@@ -2,20 +2,25 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sendistephen/room-booking/api"
 )
 
 func main() {
-	listenAddress := flag.String("listenAddress", ":5000", "The listening address of the server api")
+	listenAddr := flag.String("listenAddr", ":4000", "The listening address of the server api")
 	flag.Parse()
+
 	app := fiber.New()
 	apiv1 := app.Group("/api/v1")
-	apiv1.Get("/foo", handleFoo)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON("Hello")
+	})
+	apiv1.Get("/user", api.HandleGetUsers)
+	apiv1.Get("/:id", api.HandleGetUser)
 
-	app.Listen(*listenAddress)
-}
-
-func handleFoo(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"msg": "hello foo"})
+	if err := app.Listen(*listenAddr); err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }
